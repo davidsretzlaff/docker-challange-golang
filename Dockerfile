@@ -1,17 +1,19 @@
-FROM golang:latest
+# golang alpine 
+FROM golang:alpine AS builder
 
+#WORKDIR /app
+WORKDIR /usr/src/app
 
-# diretorio que voce vai utilizar dentro do container
-# vai criar pasta app e deixa voce ali dentro dessa pasta
-WORKDIR /app
+# COPY file go to  /usr/src/app
+COPY BindMounts /usr/src/app
 
-# copiar a pasta html  local para dentro do container
-# COPY go /usr/share/nginx/html
-
-COPY BindMounts /app
-
+# build go file
 RUN go build index.go
-#RUN exec go run index.go
+
+# generate scratch image 
+FROM scratch
+# copy go files from builder
+COPY --from=builder /usr/src/app/ .
+# exec
 CMD ["./index"]
-#ENTRYPOINT [ "echo", go run index.go ]
-#CMD [ "echo" , "test" ]
+
